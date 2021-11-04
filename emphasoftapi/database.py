@@ -1,9 +1,9 @@
 import datetime
 
-from sqlalchemy import create_engine, ForeignKey
+from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer, String,
+                        create_engine)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import Boolean, Column, Integer, String, DateTime
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
 
@@ -13,8 +13,6 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
-
-Base.metadata.create_all(bind=engine)
 
 
 def get_db():

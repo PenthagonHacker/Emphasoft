@@ -1,8 +1,14 @@
+from datetime import datetime
+
 from pydantic import BaseModel
 
 
 class UserBase(BaseModel):
     username: str
+
+
+class User(UserBase):
+    id: int
 
 
 class CreateUser(BaseModel):
@@ -16,8 +22,15 @@ class CreateUser(BaseModel):
         orm_mode = True
 
 
-class User(UserBase):
-    id: int
+class UpdateUser(BaseModel):
+    first_name: str
+    last_name: str
+    password: str
+    new_password: str
+    is_active: bool
+
+    class Config:
+        orm_mode = True
 
 
 class DisplayUser(BaseModel):
@@ -26,8 +39,17 @@ class DisplayUser(BaseModel):
     first_name: str
     last_name: str
     is_active: bool
-    last_login: str
+    last_login: datetime
     is_superuser: bool
+
+    class Config:
+        orm_mode = True
+
+
+class AuthUser(BaseModel):
+    id: int
+    token: str
+    expires: datetime
 
     class Config:
         orm_mode = True
