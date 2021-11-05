@@ -23,7 +23,8 @@ router1 = APIRouter()
 
 @router1.post("/api-token-auth/", response_model=TokenModel)
 async def auth(
-    form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+        form: OAuth2PasswordRequestForm = Depends(),
+        db: Session = Depends(get_db)
 ):
     user = await utils.get_user_by_username(form.username, db)  # type: User
     if not user:
@@ -58,7 +59,11 @@ async def get_user_by_id(id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{id}/", response_model=DisplayUser, status_code=status.HTTP_200_OK)
-async def update_user_by_id(id: int, user: UpdateUser, db: Session = Depends(get_db)):
+async def update_user_by_id(
+        id: int,
+        user: UpdateUser,
+        db: Session = Depends(get_db)
+):
     db_user_id = await utils.get_user_by_id(id, db)  # type: User
     if not db_user_id:
         raise HTTPException(status_code=400, detail=f"User with id {id} doesn't exist")
@@ -73,7 +78,9 @@ async def update_user_by_id(id: int, user: UpdateUser, db: Session = Depends(get
 
 @router.patch("/{id}/", response_model=DisplayUser, status_code=status.HTTP_200_OK)
 async def update_user_by_id(
-    id: int, user: PartiallyUpdateUser, db: Session = Depends(get_db)
+        id: int,
+        user: PartiallyUpdateUser,
+        db: Session = Depends(get_db)
 ):
     db_user_id = await utils.get_user_by_id(id, db)  # type: User
     if not db_user_id:
@@ -88,7 +95,11 @@ async def update_user_by_id(
 
 
 @router.delete("/{id}/", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_user_by_id(id: int, db: Session = Depends(get_db)):
+async def delete_user_by_id(
+        id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+):
     db_user_id = await utils.get_user_by_id(id, db)  # type: User
     if not db_user_id:
         raise HTTPException(status_code=400, detail=f"User with id {id} doesn't exist")

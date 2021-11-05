@@ -2,51 +2,49 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
-from .database import SessionLocal, User
+from . import database
 from .main import app
 
 client = TestClient(app)
 
 
 def test_get_user_by_id():
+    """Test get user by id"""
     for id in (1, 2, 3, 4):
         if id in (1, 2, 3):
-            response = client.get(f'/api/v1/users/{id}')
+            response = client.get(f"/api/v1/users/{id}")
             assert response.status_code == 200
         if id == 4:
-            response = client.get(f'/api/v1/users/{id}')
+            response = client.get(f"/api/v1/users/{id}")
             assert response.status_code == 400
 
 
 @pytest.fixture
 def get_db():
-    return SessionLocal()
+    return database.SessionLocal()
 
 
 @pytest.fixture
 def user_data(get_db: Session):
     data = {
-        'username': 'Test',
-        'first_name': 'Test',
-        'last_name': 'Test',
-        'password': 'TestPassword',
-        'is_active': True
+        "username": "John",
+        "first_name": "Doe",
+        "last_name": "Test",
+        "password": "TestPassword",
+        "is_active": True,
     }
     yield data
-    print(get_db.query(User).filter(User.username == 'Test'))
-    # get_db.query(User).filter(User.username == 'Test').delete()
+    get_db.query(database.User).filter(
+        database.User.username == data["username"]
+    ).delete()
+    get_db.commit()
 
 
 def test_create_new_user(user_data):
+    """Test create new user"""
     response = client.post(
-        '/api/v1/users/',
+        "/api/v1/users/",
         headers={"WWW-Authenticate": "Bearer"},
-        json={
-            'username': 'Test',
-            'first_name': 'Test',
-            'last_name': 'Test',
-            'password': 'TestPassword',
-            'is_active': True
-        },
+        json=user_data,
     )
     assert response.status_code == 201
