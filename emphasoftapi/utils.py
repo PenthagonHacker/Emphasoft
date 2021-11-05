@@ -6,52 +6,59 @@ import bcrypt
 from sqlalchemy.orm import Session
 
 from .database import Token, User
-from .schemas import CreateUser, DisplayUser, AuthUser
+from .schemas import CreateUser, DisplayUser, AuthUser, TokenModel
 
 
-def hash_password(password: str):
+def hash_password(password: str) -> bytes:
     """Hashing password"""
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
     return hashed_password
 
 
-def validate_password(password: str, real_hashed_password):
+def validate_password(password: str, real_hashed_password) -> bool:
     """Password validation"""
     return bcrypt.checkpw(password.encode('utf-8'), real_hashed_password)
 
 
-async def check_user(username: str, db: Session):
+async def check_user(username: str, db: Session) -> bool:
     """Checking if user already exists"""
     user = db.query(User).filter(User.username == username).first()
     if user:
         return True
 
 
-async def get_user_by_username(username: str, db: Session):
+async def get_user_by_username(username: str, db: Session) -> User:
     """Get user by username"""
     user = db.query(User).filter(User.username == username).first()
     return user
 
 
-async def get_user_by_token(token: str, db: Session):
-    user = db.query(Token).join(User).filter(Token.token == token).first()
+async def get_user_by_token(token: str, db: Session) -> User:
+    """Get user by token"""
+    user = db.query(User).join(Token).filter(Token.access_token == token).first()
     return user
 
 
-async def create_token(user_id: int, db: Session):
+async def update_last_login(user_id: int, db: Session) -> None:
+    """Updates last_login field"""
+    db.query(User).filter(User.id == user_id).update({User.last_login: datetime.utcnow()})
+    db.commit()
+
+
+async def create_token(user_id: int, db: Session) -> Token:
     """Token generation"""
     letters = string.ascii_lowercase
     token = ''.join(random.choice(letters) for _ in range(25))
     created_token = Token(
         expires=datetime.now() + timedelta(weeks=2),
         user_id=user_id,
-        token=token
+        access_token=token
     )
     db.add(created_token)
     db.commit()
     db.refresh(created_token)
-    token = AuthUser.from_orm(created_token)
-    return token.token
+    await update_last_login(user_id, db)
+    return created_token
 
 
 async def create_user(user: CreateUser, db: Session):

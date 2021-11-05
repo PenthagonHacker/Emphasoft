@@ -40,6 +40,6 @@ class Token(Base):
     __tablename__ = 'tokens'
 
     id = Column(Integer, primary_key=True)
-    token = Column(String, unique=True, nullable=False, index=True)
+    access_token = Column(String, unique=True, nullable=False, index=True)
     expires = Column(DateTime)
     user_id = Column(ForeignKey('users.id'))

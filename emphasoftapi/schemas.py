@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -7,8 +8,11 @@ class UserBase(BaseModel):
     username: str
 
 
-class User(UserBase):
+class GetCurrentUser(UserBase):
     id: int
+
+    class Config:
+        orm_mode = True
 
 
 class CreateUser(BaseModel):
@@ -50,6 +54,15 @@ class AuthUser(BaseModel):
     id: int
     token: str
     expires: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class TokenModel(BaseModel):
+    access_token: str
+    expires: datetime
+    token_type: Optional[str] = 'bearer'
 
     class Config:
         orm_mode = True
