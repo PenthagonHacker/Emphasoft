@@ -62,7 +62,18 @@ class AuthUser(BaseModel):
 class TokenModel(BaseModel):
     access_token: str
     expires: datetime
-    token_type: Optional[str] = 'bearer'
+    token_type: Optional[str] = "bearer"
+
+    class Config:
+        orm_mode = True
+
+
+class PartiallyUpdateUser(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    password: str
+    new_password: Optional[str] = None
+    is_active: Optional[bool] = True
 
     class Config:
         orm_mode = True

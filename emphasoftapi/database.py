@@ -1,7 +1,14 @@
 import datetime
 
-from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer, String,
-                        create_engine)
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    create_engine,
+)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -24,7 +31,7 @@ def get_db():
 
 
 class User(Base):
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
@@ -37,9 +44,9 @@ class User(Base):
 
 
 class Token(Base):
-    __tablename__ = 'tokens'
+    __tablename__ = "tokens"
 
     id = Column(Integer, primary_key=True)
     access_token = Column(String, unique=True, nullable=False, index=True)
     expires = Column(DateTime)
-    user_id = Column(ForeignKey('users.id'))
+    user_id = Column(ForeignKey("users.id"))
